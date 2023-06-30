@@ -34,8 +34,15 @@ export class StudentService {
     return existingStudent;
   }
 
-  async getAllStudents(): Promise<IStudent[]> {
-    const studentData = await this.studentModel.find();
+  async getAllStudents(searchTerm: string | undefined): Promise<IStudent[]> {
+    const regex = new RegExp(`^${searchTerm}` ?? '', 'i');
+    const studentData = await this.studentModel.find({
+      $or: [
+        { firstName: { $regex: regex } },
+        { lastName: { $regex: regex } },
+        { middleName: { $regex: regex } },
+      ],
+    });
     if (!studentData) {
       throw new NotFoundException('Students data not found!');
     }

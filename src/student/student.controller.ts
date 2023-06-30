@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -53,9 +54,12 @@ export class StudentController {
   }
 
   @Get()
-  async getStudents(@Res() response) {
+  async getStudents(
+    @Res() response,
+    @Query('search') searchTerm: string | undefined,
+  ) {
     try {
-      const studentData = await this.studentService.getAllStudents();
+      const studentData = await this.studentService.getAllStudents(searchTerm);
       return response.status(HttpStatus.OK).json(studentData);
     } catch (err) {
       return response.status(err.status).json(err.response);
