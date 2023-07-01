@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateRepositoryDto } from './dto/create-repository.dto';
@@ -22,5 +22,15 @@ export class RepositoryService {
     repositories: CreateRepositoryDto[],
   ): Promise<IRepository[]> {
     return await this.repositoryModel.insertMany(repositories);
+  }
+
+  async getRepository(repositoryId: string): Promise<IRepository> {
+    const existingRepository = await this.repositoryModel
+      .findById(repositoryId)
+      .exec();
+    if (!existingRepository) {
+      throw new NotFoundException(`Repository #${repositoryId} not found`);
+    }
+    return existingRepository;
   }
 }

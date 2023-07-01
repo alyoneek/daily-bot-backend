@@ -68,12 +68,4 @@ export class GroupService {
       new: true,
     });
   }
-
-  async deleteGroup(groupId: string): Promise<IGroup> {
-    const deletedGroup = await this.groupModel.findByIdAndDelete(groupId);
-    if (!deletedGroup) {
-      throw new NotFoundException(`Group #${groupId} not found`);
-    }
-    return deletedGroup;
-  }
 }

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateGroupDto } from 'src/group/dto/create-group.dto';
+import { CreateRepositoryDto } from 'src/repository/dto/create-repository.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectService } from './project.service';
 
@@ -66,6 +67,40 @@ export class ProjectController {
       const newProject = await this.projectService.deleteGroup(
         projectId,
         groupId,
+      );
+      return response.status(HttpStatus.OK).json(newProject);
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
+
+  @Post('/:id/repository')
+  async createRepository(
+    @Res() response,
+    @Param('id') projectId: string,
+    @Body() repository: CreateRepositoryDto,
+  ) {
+    try {
+      const newProject = await this.projectService.createRepository(
+        projectId,
+        repository,
+      );
+      return response.status(HttpStatus.OK).json(newProject);
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
+
+  @Delete('/:projectId/repository/:repositoryId')
+  async deleteRepository(
+    @Res() response,
+    @Param('projectId') projectId: string,
+    @Param('repositoryId') repositoryId: string,
+  ) {
+    try {
+      const newProject = await this.projectService.deleteRepository(
+        projectId,
+        repositoryId,
       );
       return response.status(HttpStatus.OK).json(newProject);
     } catch (err) {

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { RepositoryController } from './repository.controller';
 import { Repository, RepositorySchema } from './repository.schema';
 import { RepositoryService } from './repository.service';
 
@@ -13,7 +14,7 @@ import { RepositoryService } from './repository.service';
       },
     ]),
   ],
-  controllers: [],
+  controllers: [RepositoryController],
   providers: [RepositoryService],
 })
 export class RepositoryModule {}
