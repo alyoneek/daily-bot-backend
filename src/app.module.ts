@@ -5,8 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { GroupModule } from './group/group.module';
+import { ProjectModule } from './project/project.module';
+import { RepositoryModule } from './repository/repository.module';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { StudentModule } from './student/student.module';
+import { SurveyModule } from './survey/survey.module';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -25,6 +29,10 @@ import { UserModule } from './user/user.module';
     UserModule,
     AuthModule,
     StudentModule,
+    RepositoryModule,
+    SurveyModule,
+    GroupModule,
+    ProjectModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtStrategy],

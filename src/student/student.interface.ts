@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+
 export interface IStudent extends Document {
   readonly lastName: string;
   readonly irstName: string;

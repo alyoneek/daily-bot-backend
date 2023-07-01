@@ -12,18 +12,18 @@ export class StudentService {
     @InjectModel(Student.name) private studentModel: Model<IStudent>,
   ) {}
 
-  async createStudent(createStudentDto: CreateStudentDto): Promise<IStudent> {
-    const newStudent = await new this.studentModel(createStudentDto);
+  async createStudent(student: CreateStudentDto): Promise<IStudent> {
+    const newStudent = await new this.studentModel(student);
     return newStudent.save();
   }
 
   async updateStudent(
     studentId: string,
-    updateStudentDto: UpdateStudentDto,
+    student: UpdateStudentDto,
   ): Promise<IStudent> {
     const existingStudent = await this.studentModel.findByIdAndUpdate(
       studentId,
-      updateStudentDto,
+      student,
       { new: true },
     );
 
@@ -35,7 +35,7 @@ export class StudentService {
   }
 
   async getAllStudents(searchTerm: string | undefined): Promise<IStudent[]> {
-    const regex = new RegExp(`^${searchTerm}` ?? '', 'i');
+    const regex = new RegExp(`^${searchTerm ?? ''}`, 'i');
     const studentData = await this.studentModel.find({
       $or: [
         { firstName: { $regex: regex } },
