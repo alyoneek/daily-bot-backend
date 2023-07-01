@@ -37,7 +37,7 @@ export class ProjectService {
     const existingProject = await this.projectModel
       .findById(projectId)
       .populate({ path: 'users', select: '_id firstName lastName  middleName' })
-      .populate({ path: 'repositories', select: '_id name' })
+      .populate({ path: 'repositories' })
       .populate({ path: 'groups', select: '_id name' })
       .exec();
     if (!existingProject) {
