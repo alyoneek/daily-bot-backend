@@ -1,15 +1,16 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
   Post,
-  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { CreateGroupDto } from 'src/group/dto/create-group.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ProjectService } from './project.service';
 
@@ -38,14 +39,35 @@ export class ProjectController {
     }
   }
 
-  @Get()
-  async getProjects(
+  @Post('/:id/group')
+  async createGroup(
     @Res() response,
-    @Query('search') searchTerm: string | undefined,
+    @Param('id') projectId: string,
+    @Body() group: CreateGroupDto,
   ) {
     try {
-      const projects = await this.projectService.getAllProjects(searchTerm);
-      return response.status(HttpStatus.OK).json(projects);
+      const newProject = await this.projectService.createGroup(
+        projectId,
+        group,
+      );
+      return response.status(HttpStatus.OK).json(newProject);
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
+
+  @Delete('/:projectId/group/:groupId')
+  async deleteGroup(
+    @Res() response,
+    @Param('projectId') projectId: string,
+    @Param('groupId') groupId: string,
+  ) {
+    try {
+      const newProject = await this.projectService.deleteGroup(
+        projectId,
+        groupId,
+      );
+      return response.status(HttpStatus.OK).json(newProject);
     } catch (err) {
       return response.status(err.status).json(err.response);
     }

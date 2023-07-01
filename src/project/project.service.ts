@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { CreateGroupDto } from 'src/group/dto/create-group.dto';
 import { GroupService } from 'src/group/group.service';
 import { RepositoryService } from 'src/repository/repository.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -18,14 +19,14 @@ export class ProjectService {
   async createProject(project: CreateProjectDto): Promise<IProject> {
     const { groups, repositories } = project;
 
-    const addedGroups = await this.groupService.createGroupsList(groups);
-    const addedRepositories =
+    const createdGroups = await this.groupService.createGroupsList(groups);
+    const createdRepositories =
       await this.repositoryService.createRepositoriesList(repositories);
 
     const newProject = {
       ...project,
-      groups: addedGroups.map((group) => group._id),
-      repositories: addedRepositories.map((repository) => repository._id),
+      groups: createdGroups.map((group) => group._id),
+      repositories: createdRepositories.map((repository) => repository._id),
     };
 
     return this.projectModel.create(newProject);
@@ -56,5 +57,39 @@ export class ProjectService {
       throw new NotFoundException('Projects data not found!');
     }
     return projects;
+  }
+
+  async deleteProject(projectId: string): Promise<IProject> {
+    const deletedProject = await this.projectModel.findByIdAndDelete(projectId);
+    if (!deletedProject) {
+      throw new NotFoundException(`Project #${deletedProject} not found`);
+    }
+    return deletedProject;
+  }
+
+  async createGroup(
+    projectId: string,
+    group: CreateGroupDto,
+  ): Promise<IProject> {
+    const existingProject = await this.projectModel.findById(projectId);
+    if (!existingProject) {
+      throw new NotFoundException(`Project #${projectId} not found`);
+    }
+
+    const createdGroup = await this.groupService.createGroup(group);
+    existingProject.groups.push(createdGroup._id);
+    return existingProject.save();
+  }
+
+  async deleteGroup(projectId: string, groupId: string): Promise<IProject> {
+    return await this.projectModel.findByIdAndUpdate(
+      projectId,
+      {
+        $pull: { groups: groupId },
+      },
+      {
+        new: true,
+      },
+    );
   }
 }

@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { SurveyService } from 'src/survey/survey.service';
 import { CreateGroupDto } from './dto/create-group.dto';
+import { UpdateGroupDto } from './dto/update-group.dto';
 import { IGroup } from './group.interface';
 import { Group } from './group.schema';
 
@@ -35,12 +36,44 @@ export class GroupService {
   async getGroup(groupId: string): Promise<IGroup> {
     const existingGroup = await this.groupModel
       .findById(groupId)
-      .populate('users')
+      .populate({ path: 'users', select: '_id lastName firstName middleName' })
       .populate('surveys')
       .exec();
     if (!existingGroup) {
       throw new NotFoundException(`Group #${groupId} not found`);
     }
     return existingGroup;
+  }
+
+  async updateGroup(groupId: string, group: UpdateGroupDto): Promise<IGroup> {
+    const existingGroup = await this.groupModel.findById(groupId);
+    if (!existingGroup) {
+      throw new NotFoundException(`Group #${groupId} not found`);
+    }
+
+    const { surveys: deletedSurveys } = existingGroup;
+    const { surveys: createdSurveys } = group;
+
+    await this.surveyService.deleteSurveysList(deletedSurveys);
+    const addedSurveys = await this.surveyService.createSurveysList(
+      createdSurveys,
+    );
+
+    const newGroup = {
+      ...group,
+      surveys: addedSurveys.map((survey) => survey._id),
+    };
+
+    return await this.groupModel.findByIdAndUpdate(groupId, newGroup, {
+      new: true,
+    });
+  }
+
+  async deleteGroup(groupId: string): Promise<IGroup> {
+    const deletedGroup = await this.groupModel.findByIdAndDelete(groupId);
+    if (!deletedGroup) {
+      throw new NotFoundException(`Group #${groupId} not found`);
+    }
+    return deletedGroup;
   }
 }
