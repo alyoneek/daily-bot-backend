@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -35,6 +36,19 @@ export class ProjectController {
     try {
       const existingProject = await this.projectService.getProject(projectId);
       return response.status(HttpStatus.OK).json(existingProject);
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
+
+  @Get()
+  async getProjects(
+    @Res() response,
+    @Query('search') searchTerm: string | undefined,
+  ) {
+    try {
+      const projects = await this.projectService.getAllProjects(searchTerm);
+      return response.status(HttpStatus.OK).json(projects);
     } catch (err) {
       return response.status(err.status).json(err.response);
     }

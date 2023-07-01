@@ -48,7 +48,6 @@ export class ProjectService {
 
   async getAllProjects(searchTerm: string | undefined): Promise<IProject[]> {
     const regex = new RegExp(`^${searchTerm ?? ''}`, 'i');
-    console.log(searchTerm);
     const projects = await this.projectModel
       .find({
         name: { $regex: regex },
