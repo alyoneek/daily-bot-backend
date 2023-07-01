@@ -107,4 +107,21 @@ export class ProjectController {
       return response.status(err.status).json(err.response);
     }
   }
+
+  @Post('/:id/student')
+  async setStudents(
+    @Res() response,
+    @Param('id') projectId: string,
+    @Body() students: string[],
+  ) {
+    try {
+      const newProject = await this.projectService.setStudents(
+        projectId,
+        students,
+      );
+      return response.status(HttpStatus.OK).json(newProject);
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
 }

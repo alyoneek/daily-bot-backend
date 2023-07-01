@@ -54,9 +54,7 @@ export class ProjectService {
         name: { $regex: regex },
       })
       .select('_id name');
-    if (!projects) {
-      throw new NotFoundException('Projects data not found!');
-    }
+
     return projects;
   }
 
@@ -83,7 +81,7 @@ export class ProjectService {
   }
 
   async deleteGroup(projectId: string, groupId: string): Promise<IProject> {
-    return await this.projectModel.findByIdAndUpdate(
+    const updatedProject = await this.projectModel.findByIdAndUpdate(
       projectId,
       {
         $pull: { groups: groupId },
@@ -92,6 +90,11 @@ export class ProjectService {
         new: true,
       },
     );
+
+    if (!updatedProject) {
+      throw new NotFoundException(`Project #${projectId} not found`);
+    }
+    return updatedProject;
   }
 
   async createRepository(
@@ -114,7 +117,7 @@ export class ProjectService {
     projectId: string,
     repositoryId: string,
   ): Promise<IProject> {
-    return await this.projectModel.findByIdAndUpdate(
+    const updatedProject = await this.projectModel.findByIdAndUpdate(
       projectId,
       {
         $pull: { repositories: repositoryId },
@@ -123,5 +126,25 @@ export class ProjectService {
         new: true,
       },
     );
+
+    if (!updatedProject) {
+      throw new NotFoundException(`Project #${projectId} not found`);
+    }
+    return updatedProject;
+  }
+
+  async setStudents(projectId: string, students: string[]): Promise<IProject> {
+    const updatedProject = await this.projectModel.findByIdAndUpdate(
+      projectId,
+      students,
+      {
+        new: true,
+      },
+    );
+
+    if (!updatedProject) {
+      throw new NotFoundException(`Project #${projectId} not found`);
+    }
+    return updatedProject;
   }
 }
