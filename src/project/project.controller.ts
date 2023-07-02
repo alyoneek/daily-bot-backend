@@ -54,6 +54,16 @@ export class ProjectController {
     }
   }
 
+  @Delete('/:id')
+  async deleteProject(@Res() response, @Param('id') projectId: string) {
+    try {
+      const deletedProject = await this.projectService.deleteProject(projectId);
+      return response.status(HttpStatus.OK).json(deletedProject);
+    } catch (err) {
+      return response.status(err.status).json(err.response);
+    }
+  }
+
   @Post('/:id/group')
   async createGroup(
     @Res() response,
